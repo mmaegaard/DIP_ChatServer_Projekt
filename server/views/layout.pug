@@ -17,9 +17,11 @@ html
       .top-left
         a.logo(href="/") Chat App
       .top-right
+
         if user
           span.user-info Velkommen #{user.username} (niveau #{user.accessLevel})
-          a(href="/logout") Logout
+          form(method="POST", action="/users/logout", style="display:inline")
+            button(type="submit") Logout
         else
           a(href="/users/login") Login
     

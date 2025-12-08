@@ -67,7 +67,14 @@ block content
         label(for="password") Password
         input#password(type="password", name="password", required)
 
-        button(type="submit") Log ind
+        .buttons
+          button(type="submit") Log ind
+          // VIGTIGT: ikke submit — vi håndterer klik med JS
+          button#registerBtn(type="button") Opret bruger
+      
+    // Valgfri plads til fejlbeskeder
+    p#loginError.error-message(style="display:none")
+
 
   // small inline script to toggle modal visibility based on server-provided window.USER
   script.

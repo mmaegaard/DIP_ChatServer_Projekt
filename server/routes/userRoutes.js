@@ -50,7 +50,7 @@ router.get('/login', (req, res) => {
 
 /**
  * Logout (POST anbefalet)
- * Destroy session + clear cookie + redirect
+ * Destroy session
  */
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
@@ -58,25 +58,10 @@ router.post('/logout', (req, res) => {
       console.error('Fejl ved destroy under logout:', err);
       return res.status(500).send('Logout fejlede');
     }
-    // Cookie-navnet er typisk 'connect.sid' (standard for express-session)
-    // Match cookie options: mindst path:'/' (samme som i app.js session-cookie)
+    
+    // MATCH cookie-navn og path med session config i app.js
     res.clearCookie('connect.sid', { path: '/' });
     return res.redirect('/users/login');
-  });
-});
-
-/**
- * (Valgfrit) Logout via GET – hvis I vil beholde link i topbaren
- * NB: Mange vælger POST, men GET er ok i dette undervisnings-/intern-projekt
- */
-router.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      console.error('Fejl ved destroy under logout:', err);
-      return res.status(500).send('Logout fejlede');
-    }
-    res.clearCookie('connect.sid', { path: '/' });
-    return res.redirect('/users/login'); // eller '/'
   });
 });
 
