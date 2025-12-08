@@ -1,5 +1,3 @@
-// TODO: Maybe create a generateChatId method that connects to the database to prevent duplicate IDs?
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,18 +20,24 @@ function saveChats(chats) {
 }
 
 // Generér unikt chat-ID
-function generateChatId(chats) {
-    return chats.length ? chats[chats.length - 1].id + 1 : 1;
+// Make this use UUID.
+// === Outdated below ===
+// id is 'chat_id' + the current time to the millisecond,
+// for a total of 20 characters, 7 to define that it is a chat id 
+// and then 13 to make it unique (hopefully).
+// === Outdated above ===
+function generateChatId() {
+    return 'chat_id' + (new Date()).getTime();
 }
 
 // Controller-metoder
-export async function createChat(user, name) {
+export async function createChat(user, chatName) {
     const chats = loadChats();
     const newChat = {
-        id: generateChatId(chats),
-        name,
-        ownerId: user.id,
+        id: generateChatId(),
+        chatName,
         createdAt: new Date().toISOString(),
+        ownerId: user.id,
         messages: []
     };
     chats.push(newChat);
@@ -47,16 +51,16 @@ export async function getAllChats() {
 
 export async function getChatById(chatId) {
     const chats = loadChats();
-    return chats.find(c => c.id == chatId);
+    return chats.find(c => c.chatId == chatId);
 }
 
 export async function editChat(user, chatId, newName) {
     const chats = loadChats();
-    const chat = chats.find(c => c.id == chatId);
+    const chat = chats.find(c => c.chatId == chatId);
     if (!chat) throw new Error('Chat not found');
 
-    if (user.accessLevel === 3 || chat.ownerId === user.id) {
-        chat.name = newName || chat.name;
+    if (user.accessLevel === 3 || chat.ownerId === user.userId) {
+        chat.chatName = newName || chat.chatName;
         saveChats(chats);
         return chat;
     } else {
@@ -66,11 +70,11 @@ export async function editChat(user, chatId, newName) {
 
 export async function deleteChat(user, chatId) {
     const chats = loadChats();
-    const index = chats.findIndex(c => c.id == chatId);
+    const index = chats.findIndex(c => c.chatId == chatId);
     if (index === -1) throw new Error('Chat not found');
 
     const chat = chats[index];
-    if (user.accessLevel === 3 || chat.ownerId === user.id) {
+    if (user.accessLevel === 3 || chat.ownerId === user.userId) {
         chats.splice(index, 1);
         saveChats(chats);
         return true;

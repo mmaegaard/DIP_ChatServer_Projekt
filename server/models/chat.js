@@ -1,37 +1,39 @@
 // models/Chat.js
 export default class Chat {
-  constructor(id, name, ownerId, createdAt) {
-    this._id = Number(id);
-    this._name = String(name);
+  constructor(chatId, chatName, ownerId, creationDate) {
+    this._chatId = Number(chatId);
+    this._chatName = String(chatName);
     this._ownerId = Number(ownerId);
-    this._createdAt = createdAt ?? new Date().toISOString();
-    // Ingen indlejrede messages her – de ligger i messages.json
+    this._creationDate = creationDate ?? new Date().toISOString();
+    this._messages = [];
   }
 
-  // Getters
-  get id() { return this._id; }
-  get name() { return this._name; }
+    // Getters
+  get chatId() { return this._chatId; }
+  get chatName() { return this._chatName; }
   get ownerId() { return this._ownerId; }
-  get createdAt() { return this._createdAt; }
+  get creationDate() { return this._creationDate; }
+  get _messages() { return this._messages; }
 
   // Setters
-  set name(newName) {
-    if (!newName || !String(newName).trim()) throw new Error('Chat name is required');
-    this._name = String(newName).trim();
+  set chatName(newChatName) {
+    if (!newChatName || !String(newChatName).trim()) throw new Error('Chat name is required');
+    this._chatName = String(newChatName).trim();
   }
 
-  // Serialization helpers
+    // Serialization helpers
   static fromJSON(json) {
     if (!json) throw new Error('Invalid chat JSON');
-    return new Chat(json.id, json.name, json.ownerId, json.createdAt);
+    return new Chat(json.chatId, json.chatName, json.ownerId, json.creationDate);
   }
 
   toJSON() {
     return {
-      id: this._id,
-      name: this._name,
+      chatId: this._chatId,
+      chatName: this._chatName,
       ownerId: this._ownerId,
-      createdAt: this._createdAt
+      creationDate: this._creationDate
     };
   }
+
 }
