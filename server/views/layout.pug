@@ -5,28 +5,27 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1")
     title Chat App
     link(rel="stylesheet", href="/css/style.css")
-
-    //- Eksponér bruger-objekt tidligt så scripts kan bruge det
-    script.
-      window.USER = !{JSON.stringify(user || null)};
-      // window.CHATS kan sættes fra chat.pug (server-side) hvis ønsket
-      if (!window.CHATS) window.CHATS = [];
-
-  body
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css")
+  
+  body   
     .topbar
       .top-left
-        a.logo(href="/") Chat App
+        a.logo(href="/") 
+          span.logo-text-inner Trope Chat
       .top-right
-
         if user
           span.user-info Velkommen #{user.username} (niveau #{user.accessLevel})
-          form(method="POST", action="/users/logout", style="display:inline")
-            button(type="submit") Logout
+          a(href="/logout") 
+            i.fa-solid.fa-right-from-bracket
+              Logout
         else
           a(href="/users/login") Login
     
+      script.
+         window.USER = !{JSON.stringify(user || null)};     
+
     block content
 
-    //- Client scripts
+  
     script(src="/client/api.js")
-    script(type="module", src="/client/app.js")
+    script( src="/client/app.js")
