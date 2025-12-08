@@ -1,18 +1,18 @@
 // models/User.js
 export default class User {
-  constructor(id, username, password, createdAt, accessLevel = 1) {
-    this._id = Number(id);
-    this._username = String(username);
+  constructor(userId, userName, password, creationDate, accessLevel = 1) {
+    this._userId = Number(userId);
+    this._userName = String(userName);
     this._password = String(password); // i produktion: opbevar hash
-    this._createdAt = createdAt ?? new Date().toISOString();
+    this._creationDate = creationDate ?? new Date().toISOString();
     this._accessLevel = Number(accessLevel) || 1;
   }
 
   // Getters
-  get id() { return this._id; }
-  get username() { return this._username; }
+  get userId() { return this._userId; }
+  get userName() { return this._userName; }
   get password() { return this._password; }
-  get createdAt() { return this._createdAt; }
+  get creationDate() { return this._creationDate; }
   get accessLevel() { return this._accessLevel; }
 
   // Setters
@@ -25,15 +25,15 @@ export default class User {
   // Serialization helpers
   static fromJSON(json) {
     if (!json) throw new Error('Invalid user JSON');
-    return new User(json.id, json.username, json.password, json.createdAt, json.accessLevel);
+    return new User(json.userId, json.userName, json.password, json.creationDate, json.accessLevel);
   }
 
   toJSON() {
     return {
-      id: this._id,
-      username: this._username,
+      userId: this._userId,
+      userName: this._userName,
       password: this._password,
-      createdAt: this._createdAt,
+      creationDate: this._creationDate,
       accessLevel: this._accessLevel
     };
   }

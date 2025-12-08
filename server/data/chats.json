@@ -1,23 +1,89 @@
 [
   {
-    "id": 1,
-    "name": "General Chat",
+    "chatId": 1,
+    "chatName": "General Chat",
     "ownerId": 1,
-    "createdAt": "2025-11-19",
-    "messages": []
+    "creationDate": "2025-11-19",
+    "messages": [
+      {
+        "chatId": 1,
+        "messageId": 1,
+        "messageText": "Mojn",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:57:23.533Z"
+      },
+      {
+        "chatId": 2,
+        "messageId": 2,
+        "messageText": "Mojn2",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:57:40.983Z"
+      },
+      {
+        "chatId": 3,
+        "messageId": 3,
+        "messageText": "Mojn3",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:57:45.827Z"
+      }
+    ]
   },
   {
-    "id": 2,
-    "name": "Chat mojn",
+    "chatId": 2,
+    "chatName": "Mojn",
     "ownerId": 1,
-    "createdAt": "2025-12-02T22:27:47.345Z",
-    "messages": []
+    "creationDate": "2025-12-02T22:27:47.345Z",
+    "messages": [
+      {
+        "chatId": 1,
+        "messageId": 4,
+        "messageText": "Mojn1",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:58:17.919Z"
+      },
+      {
+        "chatId": 2,
+        "messageId": 5,
+        "messageText": "Mojn2",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:58:22.299Z"
+      },
+      {
+        "chatId": 3,
+        "messageId": 6,
+        "messageText": "Mojn3",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:58:26.224Z"
+      }
+    ]
   },
   {
-    "id": 3,
-    "name": "Mojn chat",
+    "chatId": 3,
+    "chatName": "Mojn chat",
     "ownerId": 1,
-    "createdAt": "2025-12-03T09:03:51.807Z",
-    "messages": []
+    "creationDate": "2025-12-03T09:03:51.807Z",
+    "messages": [
+      {
+        "chatId": 1,
+        "messageId": 7,
+        "messageText": "MojnChat1",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:58:42.968Z"
+      },
+      {
+        "chatId": 2,
+        "messageId": 8,
+        "messageText": "MojnChat2",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:58:48.545Z"
+      },
+      {
+        "chatId": 3,
+        "messageId": 9,
+        "messageText": "MojnChat3",
+        "ownerId": 1,
+        "creationDate": "2025-12-07T12:58:54.026Z"
+      }
+    ]
   }
 ]

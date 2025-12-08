@@ -1,40 +1,41 @@
-// models/Message.js
+
 export default class Message {
-  constructor(id, chatId, text, ownerId, createdAt) {
-    this._id = Number(id);
+  constructor(messageId, chatId, messageText, ownerId, creationDate) {
+    this._messageId = Number(messageId);
+    // Måske skal chatId slettes fra Message klassen. Er usikker.
     this._chatId = Number(chatId);
-    this._text = String(text);
+    this._messageText = String(messageText);
     this._ownerId = Number(ownerId);
-    this._createdAt = createdAt ?? new Date().toISOString();
+    this._creationDate = creationDate ?? new Date().toISOString();
   }
 
-  // Getters
-  get id() { return this._id; }
+    // Getters
+  get messageId() { return this._messageId; }
   get chatId() { return this._chatId; }
-  get text() { return this._text; }
+  get messageText() { return this._messageText; }
   get ownerId() { return this._ownerId; }
-  get createdAt() { return this._createdAt; }
+  get creationDate() { return this._creationDate; }
 
   // Setters
-  set text(newText) {
-    const t = (newText ?? '').trim();
-    if (!t) throw new Error('Message text cannot be empty');
+  set messageText(newMessageText) {
+    const t = (newMessageText ?? '').trim();
+    if (!t) throw new Error('Message messageText cannot be empty');
     this._text = t;
   }
 
   // Serialization helpers
   static fromJSON(json) {
     if (!json) throw new Error('Invalid message JSON');
-    return new Message(json.id, json.chatId, json.text, json.ownerId, json.createdAt);
+    return new Message(json.messageId, json.chatId, json.messageText, json.ownerId, json.creationDate);
   }
 
   toJSON() {
     return {
-      id: this._id,
+      messageId: this._messageId,
       chatId: this._chatId,
-      text: this._text,
+      messageText: this._messageText,
       ownerId: this._ownerId,
-      createdAt: this._createdAt
+      creationDate: this._creationDate
     };
   }
 }
