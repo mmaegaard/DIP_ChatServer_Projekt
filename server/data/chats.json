@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "General Chat",
+    "ownerId": 1,
+    "createdAt": "2025-11-19",
+    "messages": []
+  },
+  {
+    "id": 2,
+    "name": "Chat mojn",
+    "ownerId": 1,
+    "createdAt": "2025-12-02T22:27:47.345Z",
+    "messages": []
+  },
+  {
+    "id": 3,
+    "name": "Mojn chat",
+    "ownerId": 1,
+    "createdAt": "2025-12-03T09:03:51.807Z",
+    "messages": []
+  }
+]

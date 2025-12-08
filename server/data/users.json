@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "1234",
+    "accessLevel": 3,
+    "createdAt": "2025-11-19"
+  },
+    {
+    "id": 2,
+    "username": "Petra",
+    "password": "4321",
+    "accessLevel": 2,
+    "createdAt": "2025-12-05"
+  },
+    {
+    "id": 3,
+    "username": "Kurt",
+    "password": "1212",
+    "accessLevel": 1,
+    "createdAt": "2025-12-06"
+  }
+]

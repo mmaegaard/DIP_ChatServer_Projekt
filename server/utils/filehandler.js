@@ -1,0 +1,1 @@
+// Hjælpefunktioner -> read/write 
