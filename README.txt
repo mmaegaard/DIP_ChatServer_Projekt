@@ -3,6 +3,7 @@
 Skriv her, hvilke klasser, der er ændret siden du sidst sendte noget ind. 
 Slet ikke andre beskeder her, vi vil gerne have en nogenlunde tidslinje.
 
+
 ================================================================================================================
 === Henrik_Chatserver_v6 ; af Henrik, 08/12/2025
 Har også pillet i klasserne med det formål, at beskeder skal gemmes i data/messages.json.
