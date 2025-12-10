@@ -26,8 +26,8 @@ router.post('/login', async (req, res) => {
     if (user) {
       // Sørg for at user indeholder mindst: id, username, accessLevel
       req.session.user = {
-        id: user.id,
-        username: user.username,
+        id: user.userId,
+        username: user.userName,
         accessLevel: user.accessLevel ?? 1
       };
       // Redirect til chat-siden, så views får { user } injiceret

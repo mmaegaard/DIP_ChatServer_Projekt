@@ -30,7 +30,7 @@ export async function createChat(user, chatName) {
         id: uuid,
         chatName,
         createdAt: new Date().toISOString(),
-        ownerId: user.id,
+        ownerId: user.userId,
         messages: []
     };
     chats.push(newChat);

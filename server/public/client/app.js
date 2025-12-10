@@ -127,8 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const chats = await fetchChats();
       // Hvis server ikke er normaliseret, kan du mappe her:
       const normalized = (Array.isArray(chats) ? chats : []).map(c => ({
-        id:   c.id   ?? c.chatId,
-        name: c.name ?? c.chatName
+        id:   c.chatId   ?? c.chatId,
+        name: c.chatName ?? c.chatName
       }));
       renderChatList(normalized, container);
     } catch (err) {
@@ -149,10 +149,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       li.className = 'chat-card';
 
       const a = document.createElement('a');
-      a.href = `/messages/${chat.id}/messages`;  // “rigtigt” href; global listener stopper navigation
-      a.textContent = chat.name;
+      a.href = `/messages/${chat.chatId}/messages`;  // “rigtigt” href; global listener stopper navigation
+      a.textContent = chat.chatName;
       a.className = 'chat-link';
-      a.dataset.chatId = chat.id;
+      a.dataset.chatId = chat.chatId;
 
       li.appendChild(a);
       container.appendChild(li);
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const normalized = (Array.isArray(msgs) ? msgs : [])
         .map(normalizeMessage)
         .filter(Boolean)
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        .sort((a, b) => new Date(a.creationDate) - new Date(b.creationDate));
       renderMessages(normalized, messageListEl);
     } catch (err) {
       console.error('Kunne ikke hente beskeder', err);
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function appendMessage(container, m) {
     const li = document.createElement('li');
-    li.dataset.messageId = m.id;
+    li.dataset.messageId = m.messageId;
 
     const text = document.createElement('span');
     text.className = 'msg-text';
@@ -212,12 +212,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const meta = document.createElement('small');
     meta.className = 'msg-meta';
-    meta.textContent = ` • ${formatTime(m.createdAt)} • owner #${m.ownerId}`;
+    meta.textContent = ` • ${formatTime(m.creationDate)} • owner #${m.ownerId}`;
 
     li.appendChild(text);
     li.appendChild(meta);
 
-    const canEdit = USER && (Number(USER.accessLevel) === 3 || Number(USER.id) === Number(m.ownerId));
+    const canEdit = USER && (Number(USER.accessLevel) === 3 || Number(USER.userId) === Number(m.ownerId));
     if (canEdit) {
       const actions = document.createElement('span');
       actions.className = 'msg-actions';
@@ -244,10 +244,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   function normalizeMessage(m) {
     if (!m) return null;
     return {
-      id:        m.id        ?? m.messageId,
-      text:      m.text      ?? m.messageText,
+      id:        m.messageId    ?? m.messageId,
+      text:      m.text         ?? m.messageText,
       ownerId:   m.ownerId,
-      createdAt: m.createdAt ?? m.creationDate
+      createdAt: m.creationDate ?? m.creationDate
     };
   }
 
