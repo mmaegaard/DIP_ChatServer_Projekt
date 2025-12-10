@@ -5,6 +5,76 @@ let CURRENT_CHAT_ID = null;
 const USER = window.USER || null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+  // --- LOGIN MODAL: Opret bruger-knap ---
+  const regBtn = document.getElementById('registerBtn');
+  const usernameEl = document.getElementById('username');
+  const passwordEl = document.getElementById('password');
+  const errorEl = document.getElementById('loginError');
+  const loginForm = document.getElementById('loginForm');
+
+  if (regBtn && usernameEl && passwordEl) {
+    regBtn.addEventListener('click', async () => {
+      const username = (usernameEl.value || '').trim();
+      const password = (passwordEl.value || '').trim();
+
+      if (!username || !password) {
+        showLoginError('Udfyld brugernavn og password for at oprette.');
+        return;
+      }
+
+      try {
+        // 1) Opret bruger (JSON endpoint)
+        const regResp = await fetch('/users/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!regResp.ok) {
+          const msg = await safeReadText(regResp);
+          throw new Error(msg || 'Oprettelse fejlede');
+        }
+
+        // 2) Auto-login (jeres /users/login laver redirect til /chat)
+        // Brug form-url-encoded for at matche jeres eksisterende login-route
+        const loginResp = await fetch('/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ username, password })
+        });
+
+        if (loginResp.redirected) {
+          window.location.href = loginResp.url; // følger serverens redirect
+          return;
+        }
+        if (loginResp.ok) {
+          // fallback hvis login svarer 200 uden redirect
+          window.location.href = '/chat';
+          return;
+        }
+
+        const msg = await safeReadText(loginResp);
+        throw new Error(msg || 'Login fejlede efter oprettelse');
+      } catch (err) {
+        showLoginError(err.message || 'Noget gik galt');
+      }
+    });
+  }
+
+  function showLoginError(txt) {
+    if (!errorEl) return;
+    errorEl.textContent = txt;
+    errorEl.style.display = 'block';
+  }
+
+  async function safeReadText(resp) {
+    try { return await resp.text(); } catch { return ''; }
+  }
+  // Vores POST /users/login er bygget til klassisk form‑submit (serveren laver redirect). 
+  // Ved fetch følger browseren ikke navigation automatisk, så vi tjekker resp.redirected og navigerer manuelt.
+
+
   const chatListEl = document.getElementById('chat-list');
   const chatFormEl = document.getElementById('chat-form');
   const chatNameInput = document.getElementById('chat-name');
