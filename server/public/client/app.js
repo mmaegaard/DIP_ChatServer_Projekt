@@ -1,3 +1,4 @@
+
 // public/client/app.js
 import { fetchChats, createChat, fetchMessages, createMessage, editMessage, deleteMessage } from './api.js';
 
@@ -5,7 +6,6 @@ let CURRENT_CHAT_ID = null;
 const USER = window.USER || null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-
   // --- LOGIN MODAL: Opret bruger-knap ---
   const regBtn = document.getElementById('registerBtn');
   const usernameEl = document.getElementById('username');
@@ -13,93 +13,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errorEl = document.getElementById('loginError');
   const loginForm = document.getElementById('loginForm');
 
-  if (regBtn && usernameEl && passwordEl) {
-    regBtn.addEventListener('click', async () => {
-      const username = (usernameEl.value || '').trim();
-      const password = (passwordEl.value || '').trim();
-
-      if (!username || !password) {
-        showLoginError('Udfyld brugernavn og password for at oprette.');
-        return;
-      }
-
-      try {
-        // 1) Opret bruger (JSON endpoint)
-        const regResp = await fetch('/users/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        if (!regResp.ok) {
-          const msg = await safeReadText(regResp);
-          throw new Error(msg || 'Oprettelse fejlede');
-        }
-
-        // 2) Auto-login (jeres /users/login laver redirect til /chat)
-        // Brug form-url-encoded for at matche jeres eksisterende login-route
-        const loginResp = await fetch('/users/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ username, password })
-        });
-
-        if (loginResp.redirected) {
-          window.location.href = loginResp.url; // følger serverens redirect
-          return;
-        }
-        if (loginResp.ok) {
-          // fallback hvis login svarer 200 uden redirect
-          window.location.href = '/chat';
-          return;
-        }
-
-        const msg = await safeReadText(loginResp);
-        throw new Error(msg || 'Login fejlede efter oprettelse');
-      } catch (err) {
-        showLoginError(err.message || 'Noget gik galt');
-      }
-    });
-  }
-
-  function showLoginError(txt) {
-    if (!errorEl) return;
-    errorEl.textContent = txt;
-    errorEl.style.display = 'block';
-  }
-
-  async function safeReadText(resp) {
-    try { return await resp.text(); } catch { return ''; }
-  }
-  // Vores POST /users/login er bygget til klassisk form‑submit (serveren laver redirect). 
-  // Ved fetch følger browseren ikke navigation automatisk, så vi tjekker resp.redirected og navigerer manuelt.
-
-
-  const chatListEl = document.getElementById('chat-list');
-  const chatFormEl = document.getElementById('chat-form');
-  const chatNameInput = document.getElementById('chat-name');
-
-  const messageListEl = document.getElementById('message-list');
-  const messageFormEl = document.getElementById('message-form');
-  const messageInputEl = document.getElementById('message-input');
+  // --- ELEMENTER TIL CHAT UI ---
+  const chatListEl         = document.getElementById('chat-list');
+  const chatFormEl         = document.getElementById('chat-form');
+  const chatNameInput      = document.getElementById('chat-name');
+  const messageListEl      = document.getElementById('message-list');
+  const messageFormEl      = document.getElementById('message-form');
+  const messageInputEl     = document.getElementById('message-input');
   const currentChatTitleEl = document.getElementById('current-chat-title');
 
-  // Hent og vis chats
+  // 🔵 GLOBAL CLICK DELEGATION for .chat-link (fanger alle links, både server- og client-renderede)
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a.chat-link');
+    if (!a) return;
+    if (!document.body.contains(a)) return;  // defensivt check
+
+    e.preventDefault();                      // Stop navigation til /messages/:chatId/messages
+    const chatId   = a.dataset.chatId;
+    const chatName = a.textContent.trim();
+    console.log('[click] chat-link', { chatId, chatName });
+    setActiveChat(chatId, chatName);         // Loader beskeder i midterkolonnen
+  });
+
+  // --- Hent og vis chats i venstre side ---
   await loadChats(chatListEl);
+  autoSelectFirstChat(chatListEl);
 
-    // Klik på en chat i venstre liste (event delegation)
-  if (chatListEl) {
-    chatListEl.addEventListener('click', (e) => {
-      const a = e.target.closest('a.chat-link');
-      if (!a) return;
-      e.preventDefault();
-      const chatId = a.dataset.chatId;
-      const chatName = a.textContent.trim();
-      setActiveChat(chatId, chatName);
-    });
-  }
-
-  // Eventlistener til opret-chat
+  // --- Opret ny chat ---
   if (chatFormEl) {
     chatFormEl.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -118,9 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ----- MESSAGES -----
-
-  // Send besked
+  // --- Send besked ---
   if (messageFormEl) {
     messageFormEl.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -130,7 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       try {
         const newMsg = await createMessage(CURRENT_CHAT_ID, text);
-        appendMessage(messageListEl, newMsg);
+        const normalized = normalizeMessage(newMsg);
+        appendMessage(messageListEl, normalized);
         if (messageInputEl) messageInputEl.value = '';
       } catch (err) {
         console.error(err);
@@ -138,34 +77,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
-  
-  // Rediger/Slet message via event delegation
+
+  // --- Rediger/Slet besked via delegation ---
   if (messageListEl) {
     messageListEl.addEventListener('click', async (e) => {
-      const btnEdit = e.target.closest('.btn-edit');
+      const btnEdit   = e.target.closest('.btn-edit');
       const btnDelete = e.target.closest('.btn-delete');
-      const li = e.target.closest('li[data-message-id]');
+      const li        = e.target.closest('li[data-message-id]');
       if (!li) return;
       const messageId = li.dataset.messageId;
 
-      // Rediger message
+      // Rediger
       if (btnEdit) {
         const currentText = li.querySelector('.msg-text')?.textContent || '';
         const newText = prompt('Ny tekst:', currentText);
-        if (newText == null) return; // cancel
+        if (newText == null) return;
         const trimmed = newText.trim();
         if (!trimmed || trimmed === currentText) return;
 
         try {
-          const updated = await editMessage(CURRENT_CHAT_ID, messageId, trimmed);
-          li.querySelector('.msg-text').textContent = updated.text;
+          const updated    = await editMessage(CURRENT_CHAT_ID, messageId, trimmed);
+          const normalized = normalizeMessage(updated);
+          li.querySelector('.msg-text').textContent = normalized.text;
         } catch (err) {
           console.error(err);
           alert(err.message || 'Kunne ikke redigere besked');
         }
       }
 
-      // Slet message
+      // Slet
       if (btnDelete) {
         if (!confirm('Slet denne besked?')) return;
         try {
@@ -178,47 +118,52 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
-  
-  // Vælg første chat automatisk (hvis nogen)
-  autoSelectFirstChat(chatListEl);
 
-  // ---- Helpers (inde i DOMContentLoaded, så de kan bruge elementer ovenfor) ----
+  // ---- Helpers ----
 
   async function loadChats(container) {
     if (!container) return;
     try {
       const chats = await fetchChats();
-      renderChatList(chats, container);
+      // Hvis server ikke er normaliseret, kan du mappe her:
+      const normalized = (Array.isArray(chats) ? chats : []).map(c => ({
+        id:   c.id   ?? c.chatId,
+        name: c.name ?? c.chatName
+      }));
+      renderChatList(normalized, container);
     } catch (err) {
-      container.innerHTML = `<p class="error">Fejl: ${err.message}</p>`;
+      console.error('Fejl ved hentning af chats:', err);
+      container.innerHTML = `<li class="error">Fejl: ${err.message}</li>`;
     }
   }
 
   function renderChatList(chats, container) {
     container.innerHTML = '';
     if (!chats || chats.length === 0) {
-      container.innerHTML = '<p>Ingen chats endnu.</p>';
+      container.innerHTML = '<li>Ingen chats endnu.</li>';
       return;
     }
-    const ul = document.createElement('ul');
+    // Render direkte li’s ind i #chat-list (undgå nested <ul> i <ul>)
     chats.forEach(chat => {
       const li = document.createElement('li');
+      li.className = 'chat-card';
+
       const a = document.createElement('a');
-      a.href = `/messages/${chat.id}/messages`;
+      a.href = `/messages/${chat.id}/messages`;  // “rigtigt” href; global listener stopper navigation
       a.textContent = chat.name;
       a.className = 'chat-link';
       a.dataset.chatId = chat.id;
+
       li.appendChild(a);
-      ul.appendChild(li);
+      container.appendChild(li);
     });
-    container.appendChild(ul);
   }
 
   function autoSelectFirstChat(container) {
     if (!container) return;
     const first = container.querySelector('a.chat-link');
     if (first) {
-      const chatId = first.dataset.chatId;
+      const chatId   = first.dataset.chatId;
       const chatName = first.textContent.trim();
       setActiveChat(chatId, chatName);
     }
@@ -236,8 +181,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!messageListEl) return;
     messageListEl.innerHTML = '<li>Henter beskeder...</li>';
     try {
-      const msgs = await fetchMessages(chatId); // <-- BRUGER den importerede funktion
-      renderMessages(msgs, messageListEl);
+      const msgs = await fetchMessages(chatId);
+      const normalized = (Array.isArray(msgs) ? msgs : [])
+        .map(normalizeMessage)
+        .filter(Boolean)
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      renderMessages(normalized, messageListEl);
     } catch (err) {
       console.error('Kunne ikke hente beskeder', err);
       messageListEl.innerHTML = '<li class="error">Kunne ikke hente beskeder</li>';
@@ -268,9 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     li.appendChild(text);
     li.appendChild(meta);
 
-    // Viser rediger/slet hvis bruger er owner eller admin
     const canEdit = USER && (Number(USER.accessLevel) === 3 || Number(USER.id) === Number(m.ownerId));
-
     if (canEdit) {
       const actions = document.createElement('span');
       actions.className = 'msg-actions';
@@ -291,8 +238,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     container.appendChild(li);
-    // Scroll til bund
     container.parentElement?.scrollTo?.(0, container.parentElement.scrollHeight);
+  }
+
+  function normalizeMessage(m) {
+    if (!m) return null;
+    return {
+      id:        m.id        ?? m.messageId,
+      text:      m.text      ?? m.messageText,
+      ownerId:   m.ownerId,
+      createdAt: m.createdAt ?? m.creationDate
+    };
   }
 
   function formatTime(iso) {

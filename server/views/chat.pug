@@ -6,13 +6,13 @@ block content
     // LEFT SIDEBAR
     aside.left-column
       h2 Topics
-        // - Hvis der er chats - render dem som chats i placeholders 
+      // - Hvis der er chats - render dem som chats i placeholders 
       ul#chat-list
         if chats && chats.length
           each chat in chats
             li.chat-card
-              a.chat-link(href=`/messages/${chat.chatId}/messages`, data-chat-id=chat.chatId) #{chat.chatName}
-              //a(href=`/messages/${chat.chatId}/messages`) #{chat.chatName} (id: #{chat.chatId})
+              a.chat-link(href=`/messages/${chat.id}/messages`, data-chat-id=chat.id)= chat.chatName
+              //a(href=`/messages/${chat.chatId}/messages`) #{chat.name} (id: #{chat.chatId})
         else
           li.placeholder
           li.placeholder
