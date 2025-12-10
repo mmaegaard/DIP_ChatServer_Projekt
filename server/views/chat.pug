@@ -6,52 +6,57 @@ block content
     // LEFT SIDEBAR
     aside.left-column
       h2 Topics
-
-        //- If there are chats, render them as cards inside placeholders
+        // - Hvis der er chats - render dem som chats i placeholders 
       ul#chat-list
-        if chats && chats.length       
+        if chats && chats.length
           each chat in chats
             li.chat-card
-              a.chat-link(href=`/messages/${chat.id}/messages`,
-               data-chat-id=chat.id) #{chat.name}                
-        else        
+              a.chat-link(href=`/messages/${chat.chatId}/messages`, data-chat-id=chat.chatId) #{chat.chatName}
+              //a(href=`/messages/${chat.chatId}/messages`) #{chat.chatName} (id: #{chat.chatId})
+        else
           li.placeholder
           li.placeholder
           li.placeholder
-          li.placeholder
+          li.placeholder 
+
+      // create new chat
+      h3 Opret ny chat
+      form#chat-form
+        input(type="text", id="chat-name", placeholder="Chat navn", required)
+        button(type="submit") Opret
 
     // CENTER COLUMN
     main.center-column
-      .chat-creation-box#chat-creation-area
-        h3 Opret ny chat
-        form#chat-form
-          input(type="text", id="chat-name", placeholder="Chat navn", required)
-          button.btn-primary(type="submit") Opret
-
-      h2.center-title CHAT NAME
+      h2.center-title Chat
       // Valgt chats navn
       h3#current-chat-title Ingen valgt chat
-      
-      
+
+
       // Liste over beskeder
       ul#message-list
 
       // ---BUTTONS (Opret / Slet) ---
+      
+      // Opret ny besked
+      form#message-form
+        input(type="text", id="message-input", placeholder="Skriv en besked...", required)
+        button(type="submit") Send
+
       if user && (user.accessLevel === 2 || user.accessLevel === 3)
         .chat-footer
           button#createChatBtn(type="button") Opret
           button#deleteChatBtn(type="button") Slet    
-        
 
     // RIGHT SIDEBAR
     aside.right-column
-      h3 BRUGER
-       p#room-details Søge funktion
-       
+      h3 Room Details
+      //p#room-details Ingen valgt chat
+
   // LOGIN MODAL 
   div#loginModal.login-modal
     .modal-content
       h2 Log ind
+      // VIGTIGT: korrekt route under /users
       form#loginForm(method="POST", action="/users/login")
         label(for="username") Brugernavn
         input#username(type="text", name="username", required)
@@ -59,7 +64,14 @@ block content
         label(for="password") Password
         input#password(type="password", name="password", required)
 
-        button(type="submit") Log ind
+        .buttons
+          button(type="submit") Log ind
+          // VIGTIGT: ikke submit — vi håndterer klik med JS
+          button#registerBtn(type="button") Opret bruger
+      
+    // Valgfri plads til fejlbeskeder
+    p#loginError.error-message(style="display:none")
+
 
   // small inline script to toggle modal visibility based on server-provided window.USER
   script.
@@ -67,12 +79,19 @@ block content
       const user = window.USER;
       const modal = document.getElementById('loginModal');
       const messageForm = document.getElementById('message-form');
+      const grid = document.querySelector('.grid-root'); // Indsat ifbm. modal-login
 
-      if (user) {
+      const hasAccess = !!(user && Number(user.accessLevel) >= 1); // Indsat ifbm. modal-login
+
+      if (hasAccess) {
         if (modal) modal.style.display = 'none';
         if (messageForm) messageForm.style.display = 'flex';
+        if (grid) { grid.style.filter = 'none'; grid.style.pointerEvents = 'auto'; } // modal-login
       } else {
         if (modal) modal.style.display = 'flex';
         if (messageForm) messageForm.style.display = 'none';
+        if (grid) { grid.style.filter = 'blur(2px)'; grid.style.pointerEvents = 'none'; } // modal-login
       }
     });
+
+    // Tip: Blur + pointer-events: none gør det tydeligt, at man ikke kan interagere uden login.
