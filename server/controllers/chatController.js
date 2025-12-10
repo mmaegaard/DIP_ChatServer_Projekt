@@ -19,22 +19,15 @@ function saveChats(chats) {
     fs.writeFileSync(chatsFile, JSON.stringify(chats, null, 2));
 }
 
-// Generér unikt chat-ID
-// Make this use UUID.
-// === Outdated below ===
-// id is 'chat_id' + the current time to the millisecond,
-// for a total of 20 characters, 7 to define that it is a chat id 
-// and then 13 to make it unique (hopefully).
-// === Outdated above ===
-function generateChatId() {
-    return 'chat_id' + (new Date()).getTime();
-}
-
 // Controller-metoder
 export async function createChat(user, chatName) {
     const chats = loadChats();
+
+    // Genererer et uuid til den nye besked.
+    let uuid = Crypto.randomUUID();
+
     const newChat = {
-        id: generateChatId(),
+        id: uuid,
         chatName,
         createdAt: new Date().toISOString(),
         ownerId: user.id,
