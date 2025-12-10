@@ -19,23 +19,5 @@
     "password": "1212",
     "accessLevel": 1,
     "creationDate": "2025-12-06"
-  },
-  {
-    "id": null,
-    "username": "Karl",
-    "password": "2121",
-    "accessLevel": 1
-  },
-  {
-    "id": 1,
-    "username": "Conny",
-    "password": "666",
-    "accessLevel": 1
-  },
-  {
-    "id": 2,
-    "username": "Peter",
-    "password": "5555",
-    "accessLevel": 1
   }
 ]
