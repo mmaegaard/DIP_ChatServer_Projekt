@@ -7,19 +7,17 @@ const router = express.Router();
 
 // Registrer ny bruger
 router.post('/register', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const newUser = await userController.createUser(username, password);
-    res.status(201).json(newUser);
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
+    try {
+        const { username, password } = req.body;
+        const newUser = await userController.createUser(username, password);
+        res.status(201).json(newUser);
+    } catch (err) {
+        res.status(400).send(err.message);
+    }
 });
 
-  /* Login (POST)
-  * Sætter req.session.user = { id, username, accessLevel, ... }
-  */
-  router.post('/login', async (req, res) => {
+// Login
+router.post('/login', async (req, res) => {
     try {
       console.log('LOGIN POST body:', req.body);
       const { username, password } = req.body;
@@ -50,7 +48,7 @@ router.get('/login', (req, res) => {
 
 /**
  * Logout (POST anbefalet)
- * Destroy session
+ * Destroy session + clear cookie + redirect
  */
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
@@ -58,11 +56,17 @@ router.post('/logout', (req, res) => {
       console.error('Fejl ved destroy under logout:', err);
       return res.status(500).send('Logout fejlede');
     }
-    
-    // MATCH cookie-navn og path med session config i app.js
+    // Cookie-navnet er typisk 'connect.sid' (standard for express-session)
+    // Match cookie options: mindst path:'/' (samme som i app.js session-cookie)
     res.clearCookie('connect.sid', { path: '/' });
     return res.redirect('/users/login');
   });
+});
+
+// Logout
+router.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/chat');
 });
 
 // Hent alle brugere (kun admin)
