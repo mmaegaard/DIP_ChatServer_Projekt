@@ -3,6 +3,9 @@
 Skriv her, hvilke klasser, der er ændret siden du sidst sendte noget ind. 
 Slet ikke andre beskeder her, vi vil gerne have en nogenlunde tidslinje.
 ================================================================================================================
+
+== Tobias er forvirret_v8 ; af Tobias, 10-12-2025
+Logout virker, af en eller anden grund...
 === Tobias_Chatserver_v7 ; af Tobias, 08/12/2025
 Har integreret Henrik_Chatserver_v6 og lidt ekstra i models klasserne.
 Arbejdet har egentligt været et fuldt overhaul, så alle klasser er muligvis ændrede.
