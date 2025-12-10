@@ -20,17 +20,6 @@ function saveChats(chats) {
     fs.writeFileSync(chatsFile, JSON.stringify(chats, null, 2));
 }
 
-// Generér unikt message-ID
-// Make this use UUID.
-// === Outdated below ===
-// id is 'msg_id' + the current time to the millisecond,
-// for a total of 19 characters, 6 to define that it is a message id 
-// and then 13 to make it unique (hopefully).
-// === Outdated above ===
-function generateMessageId() {
-    return 'msg_id' + (new Date()).getTime();
-}
-
 /* ----------------------------
    READ HELPERS (REN ARKITEKTUR)
 ----------------------------- */
@@ -63,8 +52,11 @@ export async function createMessage(user, chatId, messageText) {
     const chat = chats.find(c => c.chatId == chatId);
     if (!chat) throw new Error('Chat not found');
 
+    // Genererer et uuid til den nye besked.
+    let uuid = Crypto.randomUUID();
+
     const newMessage = {
-        messageId: generateMessageId(),
+        messageId: uuid,
         messageText: messageText,
         ownerId: user.userId,
         creationDate: new Date().toISOString()

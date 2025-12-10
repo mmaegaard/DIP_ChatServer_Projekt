@@ -20,17 +20,6 @@ function saveUsers(users) {
     fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
 }
 
-// Generér unikt user-ID
-// Make this use UUID.
-// === Outdated below ===
-// id is 'user_id' + the current time to the millisecond,
-// for a total of 20 characters, 7 to define that it is a user id 
-// and then 13 to make it unique (hopefully).
-// === Outdated above ===
-function generateUserId() {
-    return 'user_id' + (new Date()).getTime();
-}
-
 // Opret bruger
 export async function createUser(userName, password, accessLevel = 1) {
     const users = loadUsers();
@@ -40,8 +29,11 @@ export async function createUser(userName, password, accessLevel = 1) {
         throw new Error('Username already taken');
     }
 
+    // Genererer et uuid til den nye besked.
+    let uuid = Crypto.randomUUID();
+
     const newUser = {
-        userId: generateUserId(),
+        userId: uuid,
         userName,
         password, // OBS: Skal helst hashes senere!
         creationDate: new Date().toISOString(),
